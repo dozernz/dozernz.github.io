@@ -4,5 +4,39 @@ title: Advisories
 permalink: /advisories/
 ---
 
-A list of my public advisories. Most of these contain multiple vulnerabilities, and all contain proof of concept details.
+A list of my (old) public advisories. Most of these contain multiple vulnerabilities, and all contain full proof of concept exploit details. The majority contain remote preauth -> root exploit bug chains.
 
+
+Below advisories mirrored from: www.security-assessment.com
+#### [Cisco WSA - July 2016](https://web.archive.org/web/20171011143514/https://security-assessment.com/files/documents/advisory/Cisco-WSA-Advisory-release.pdf)
+Partial Auth bypass, authenticated code execution, Stored XSS in Cisco Web Security Appliance
+
+#### [Cisco Prime Infrastructure - Jun 2016](https://security-assessment.com/files/documents/advisory/Cisco-Prime-Infrastructure-Release.pdf)
+API authentication bypass, authenticated code execution, Privilege Escalation, unauthenicated XXE and unauthenticated SQLi
+
+#### [Cisco Prime vNAM - Jun 2016](https://security-assessment.com/files/documents/advisory/Cisco-Prime-vNam.pdf)
+Unauthenticated remote code execution, privesc, subshell breakout in Cisco Prime vNAM
+
+#### [Kaltura - Mar 2016](https://security-assessment.com/files/documents/advisory/Kaltura-Multiple-Vulns.pdf)
+Preauth RCE via unserialize, authenticated file upload, preauth SSRF, cryptographic weakness leading to account takeover, stored XSS
+
+#### [CYAN - Nov 2015](https://security-assessment.com/files/documents/advisory/Cyan%20Secure%20Web%20-%20Multiple%20Vulnerabilities.pdf)
+Authentication byass, authed file write to shell, privilege escalation.
+
+#### [Symantec Web Gateway - Sep 2015](https://security-assessment.com/files/documents/advisory/Symantec-advisory-Final.pdf)
+Authenticated SQLi, authenticated command injection
+
+#### [Silver Peak VXOA - Sep 2015](https://security-assessment.com/files/documents/advisory/Silverpeak-Advisory-Final.pdf)
+Preauth file read, post auth command injection, mass assignment, shell file upload , hardcoded admin credentials, subshell breakout.
+
+#### [Citrix Netscaler - Jun 2015](https://security-assessment.com/files/documents/advisory/Citrix-Netscaler-Final.pdf)
+Authenticated command injection, privilege escalation
+
+#### [WedgeOS - Jun 2015](https://security-assessment.com/files/documents/advisory/WedgeOS-Final.pdf)
+Preauth file read, authenticated command injection, privilege escalation
+
+#### [Watchguard XCS - Jun 2015](https://security-assessment.com/files/documents/advisory/Watchguard-XCS-final.pdf)
+Preauth SQLi, command injection, privilege escalation
+
+#### [Liferay Portal - Feb 2015](https://security-assessment.com/files/documents/advisory/LR-file-upload.pdf)
+Authenticated file upload to shell
