@@ -6,8 +6,6 @@ permalink: /advisories/
 
 A list of my (old) public advisories. Most of these contain multiple vulnerabilities, and all contain full proof of concept exploit details. The majority contain remote preauth -> root exploit bug chains.
 
-
-Below advisories mirrored from: www.security-assessment.com
 #### [Cisco WSA - July 2016](https://web.archive.org/web/20171011143514/https://security-assessment.com/files/documents/advisory/Cisco-WSA-Advisory-release.pdf)
 Partial Auth bypass, authenticated code execution, Stored XSS in Cisco Web Security Appliance
 
