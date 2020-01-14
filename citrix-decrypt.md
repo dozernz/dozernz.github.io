@@ -6,7 +6,7 @@ permalink: /citrix-decrypt/
 
 ## Netscaler
 
-Netscaler has a hardcoded RC4 encryption key used to encrypt cleartext passwords stored in the config, such as for LDAP. The static encryption key exists in the libnscli90.so library, and as of 10.5 is `2286da6ca015bcd9b7259753c2a5fbc2`.
+Netscaler has a hardcoded RC4 encryption key used to encrypt cleartext passwords stored in the config, such as for LDAP. The static encryption key exists in the libnscli90.so library. As of 10.5 this was `2286da6ca015bcd9b7259753c2a5fbc2`. (now updated, see below)
 
 The below python script will decrypt LDAP and similar encrypted values obtained from the config.
 ````
@@ -41,8 +41,7 @@ This seems to have changed at some point and now ldap bind passwords are encrypt
 
 Note the `-encryptmethod ENCMTHD_3` in the config. 
 
-After some quick RE i figured out this ENCMTHD_3 is just AES256-CBC with a different key ("351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9"). Heres the way to decrypt ENCMTHD_3 values (the default).
-
+After some quick RE on a 12.0 type i figured out this ENCMTHD_3 is just AES256-CBC with a different key `351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9`. Heres the way to decrypt ENCMTHD_3 values (the default).
 
 
 ```
