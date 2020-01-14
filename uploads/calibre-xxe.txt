@@ -1,0 +1,30 @@
+# Overview
+The EPUB importer for Calibre has an XML External Entity Injection that allows a malicious EPUB to read a file from the filesystem of the host Calibre is running on. If this EPUB is opened in the Viewer then embedded Javascript can be used to read this file and exfiltrate its contents to an external host.
+
+# Affected Versions
+Calibre <= 4.7.0 on Linux (latest at this time)
+
+# Description
+
+When importing an EPUB into calibre there is an XXE vulnerability that allows reading of local files through the "file:///" URI handler. This can be exploited by placing the XXE inside the EPUB's OPF file, as below:
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>
+..<snip>..
+ <dc:publisher id="esc_publisher">&xxe;</dc:publisher>
+..<snip>..
+
+This XXE cannot be used to exfiltrate files directly through the use of external DTDs or OOB techniques, as these are disabled at the XML parser level. However after import the OPF file is used to create a book metadata JSON file which is accessible from inside the reader sandbox, and so can be accessed by Javascript running in the EPUB at the 'clbr://internal.sandbox/book/calibre-book-metadata.json' URL.
+
+# Reproduction
+1. Import the attached EPUB into Calibre running on a Linux system .
+2. Observe that the contents of /etc/passwd are present in the Publisher section of the book.
+3. Open the book in the Viewer and click the "do xxe" button (this can also be clicked automatically by Javascript and does not require user interaction).
+4. Observe the contents of the system's /etc/passwd are output in the book.
+
+# Additional notes
+If you read the embedded "EPUB/js/main.js" file you can see commented out Javascript that will exfiltrate the file contents as a base64 blob to an external host. Enabling this will show that the file can be exfiltrated from the host.
+
+Thanks to Craig Arendt (@signalchaos) for the ebook research and POC that I based this off.
+
+Other book formats are likely impacted by this issue as well.
