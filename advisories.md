@@ -6,6 +6,9 @@ permalink: /advisories/
 
 A list of my (old) public advisories. Most of these contain multiple vulnerabilities, and all contain full proof of concept exploit details. The majority contain remote preauth -> root exploit bug chains.
 
+#### [Calibre - December 2019](/uploads/calibre-xxe.txt)
+Straightforward XXE then exfiltration of the read file from inside the sandbox. [Launchpad Ref](https://bugs.launchpad.net/calibre/+bug/1857800), fixed in 4.8. POC at [poc3.epub](/uploads/poc3.epub)
+
 #### [Cisco WSA - July 2016](https://web.archive.org/web/20171011143514/https://security-assessment.com/files/documents/advisory/Cisco-WSA-Advisory-release.pdf)
 Partial Auth bypass, authenticated code execution, Stored XSS in Cisco Web Security Appliance
 
