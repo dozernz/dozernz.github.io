@@ -6,7 +6,9 @@ permalink: /citrix-decrypt/
 
 ## Netscaler
 
-Citrix Netscaler (or whatever they're calling it now) uses hardcoded encryption keys to encrypt at least some passwords stored in the appliance config, most importantly for LDAP bind passwords. These static encryption keys are compliled into the `libnscli90.so` library on the appliance. As of 10.5 this was the RC4 key `2286da6ca015bcd9b7259753c2a5fbc2`. At some point they changed the default key and cipher used to encrypt cleartext values. The default key is now `351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9`, and the appliance now (12.0) uses AES256-CBC instead of RC4. I figured out after a quick bit of RE that the version signifier seems the be the `-encryptmethod` flag, where `ENCMTHD_3` signifies it is using AES256-CBC and the new default key.   
+Citrix Netscaler (or whatever they're calling it now) uses hardcoded encryption keys to encrypt at least some passwords stored in the appliance config, most importantly for LDAP bind passwords. As a side note - **the passwords for accessing the appliance itself via CLI or GUI are hashed, not encrypted**. You can still attempt to break these using hashcat but it requires bruteforcing.
+
+However, some other values in the config like LDAP bind passwords are encrypted and can be recovered as by default they are encrypted by hardcoded keys that seem to be common to all Netscalers. These static encryption keys are compliled into the `libnscli90.so` library on the appliance. As of 10.5 this was the RC4 key `2286da6ca015bcd9b7259753c2a5fbc2`. At some point Citrix changed the default key and cipher used to encrypt cleartext values. The default key is now `351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9`, and the appliance now (12.0) uses AES256-CBC instead of RC4. I figured out after a quick bit of RE that the version signifier seems the be the `-encryptmethod` flag, where `ENCMTHD_3` signifies it is using AES256-CBC and the new default key.   
 
 
 ### Additional notes
