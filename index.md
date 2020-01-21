@@ -4,7 +4,7 @@
 # See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: home
 ---
-Personal hacking and security blog by @dozernz 
+Personal hacking and security blog by [@dozernz](https://twitter.com/dozernz) 
 
 See [about](/about), my (public) [advisories](/advisories), or the [only actual post](/citrix-decrypt/)
 
