@@ -4,3 +4,8 @@
 # See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: home
 ---
+Personal hacking and security blog by @dozernz 
+
+See [about](/about) or the [only actual post](/citrix-decrypt/)
+
+![](/assets/uc.gif "Under Construction")
