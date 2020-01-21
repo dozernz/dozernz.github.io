@@ -6,6 +6,6 @@ layout: home
 ---
 Personal hacking and security blog by @dozernz 
 
-See [about](/about) or the [only actual post](/citrix-decrypt/)
+See [about](/about), my (public) [advisories](/advisories), or the [only actual post](/citrix-decrypt/)
 
 ![](/assets/uc.gif "Under Construction")
