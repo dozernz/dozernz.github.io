@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Decrypting values from the Citrix Netscaler config
+title: Citrix Netscaler config decryption
 permalink: /citrix-decrypt/
 ---
 
