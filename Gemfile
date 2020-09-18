@@ -4,7 +4,7 @@ source "https://rubygems.org"
 gem "minima"
 gem 'jekyll-sitemap'
 gem "github-pages", group: :jekyll_plugins
-
+gem 'jekyll-redirect-from'
 
 # If you have any plugins, put them here!
 group :jekyll_plugins do

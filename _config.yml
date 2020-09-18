@@ -28,4 +28,4 @@ plugins:
   - jekyll-feed
   - jekyll-target-blank
   - jekyll-sitemap
-
+  - jekyll-redirect-from

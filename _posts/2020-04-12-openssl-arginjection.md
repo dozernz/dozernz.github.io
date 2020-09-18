@@ -1,7 +1,9 @@
 ---
-layout: page
+layout: post
 title: OpenSSL Arg Injection 
-permalink: /openssl-arginjection/
+permalink: /posts/openssl-arginjection
+redirect_from:
+  - /openssl-arginjection/
 ---
 
 # OpenSSL code execution through argument injection

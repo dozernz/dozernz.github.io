@@ -1,7 +1,9 @@
 ---
 layout: page
 title: Citrix Netscaler config decryption
-permalink: /citrix-decrypt/
+permalink: /posts/citrix-decrypt/
+redirect_from:
+  - /citrix-decrypt/
 ---
 
 ## Netscaler
