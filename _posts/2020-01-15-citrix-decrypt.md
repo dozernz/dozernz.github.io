@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: Citrix Netscaler config decryption
 permalink: /posts/citrix-decrypt/
 redirect_from:
