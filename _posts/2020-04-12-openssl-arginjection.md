@@ -6,8 +6,6 @@ redirect_from:
   - /openssl-arginjection/
 ---
 
-# OpenSSL code execution through argument injection
-
 This is a short little post detailing how to get OpenSSL to run arbitrary code through the use of the `-engine` option. As detailed in the docs, an OpenSSL engine is a new component "to support alternative cryptography implementations, most commonly for interfacing with external crypto devices".  These engines consist of compiled code which is loaded by OpenSSL, and can be used to run arbitrary code. 
 
 This is useful in situations such as if you have the ability to pass arguments (like in an argument injection vulnerability) to OpenSSL, or can alter a configuration file used to generate certificates. If you have sudo access to OpenSSL, you can easily elevate to full root. Exploiting this does however require placing the malicious engine file somewhere on the disk of the target file system. 

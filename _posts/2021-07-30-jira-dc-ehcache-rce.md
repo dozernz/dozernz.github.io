@@ -5,8 +5,6 @@ date:   2021-07-30
 permalink: posts/CVE-2020-36239-POC-dev
 ---
 
-## Overview
-
 Last Friday I saw an [Atlassian security advisory for a critical RCE in Jira Data Center (CVE-2020-36239)](https://confluence.atlassian.com/adminjiraserver/jira-data-center-and-jira-service-management-data-center-security-advisory-2021-07-21-1063571388.html), so I decided to try to develop a proof of concept exploit for it. This ended up taking me about 5 hours. This short blog post details the process I went through to create the POC. I've also included some of the mistakes made and dead ends I went down, which is all too often missing from POC writeups.
 
 This was a good exercise in creating a POC for a patched vulnerability, as I was able to do it without diffiing patches. I learnt some more about exploiting RMI, and the changes in JEP 290.

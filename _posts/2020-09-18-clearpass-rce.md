@@ -5,8 +5,6 @@ date:   2020-09-18
 permalink: posts/aruba-clearpass-rce
 ---
 
-**Unauthenticated RCE in Aruba ClearPass Policy Manager <= 6.9.0 (CVE-2020-7115)**
-
 I discovered an unauthenticated RCE vulnerability in Aruba ClearPass Policy Manager that I reported to Aruba, and it is now fixed. The Aruba security bulletin is available at [ARUBA-PSA-2020-005.txt](https://www.arubanetworks.com/assets/alert/ARUBA-PSA-2020-005.txt). Exploiting this vulnerability uses a couple of interesting tricks that I'll explain in this post. 
 
 ## Discovery

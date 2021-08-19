@@ -5,10 +5,7 @@ date:   2021-03-03
 permalink: posts/saltapi-vulns
 ---
 
-
-**Details on CVE-2021-3197, CVE-2021-25281 and CVE-2021-25282**
-
-In November 2020 after seeing a pre-auth RCE (CVE-2020-16846, CVE-2020-25592) [get dropped](https://www.thezdi.com/blog/2020/11/24/detailing-saltstack-salt-command-injection-vulnerabilities) for Salt API, I wanted to find my own. 
+In November 2020 after seeing a pre-auth RCE (CVE-2020-16846, CVE-2020-25592) [get dropped](https://www.thezdi.com/blog/2020/11/24/detailing-saltstack-salt-command-injection-vulnerabilities) for Salt API, I wanted to find my own. This resulted in CVE-2021-3197, CVE-2021-25281 and CVE-2021-25282, which I detail in this post.
 
 [Looking at the patch for CVE-2020-16846](https://gitlab.com/saltstack/open/salt-patches/-/blob/master/patches/2020/09/02/3002.patch#L32) you can see they have added a `_split_cmd` function that splits the arguments into a list, and removed the use of the `shell=True` option. While this was effective at preventing command injection through shell metacharacters, it still allowed an attacker to specify arbitrary arguments to the ssh command. By adding an SSH option after any of the POSTed ssh parameters - e.g.  `ssh_port=2222%09-o%20ProxyCommand="touch%20/tmp/rce"`, the argument injection could be turned into arbitrary command execution. The %09 is a tab character is used for seperation, however a %20 works just as well. This ended up as CVE-2021-3197. The patch release adds [a case sensitive check for "ProxyCommand"](https://github.com/saltstack/salt/blob/08fe46365f92583ea875f9e4a8b2cb5305b34e4b/salt/client/ssh/client.py#L72) in the arguments passed to SSH.
 

@@ -6,9 +6,9 @@ redirect_from:
   - /citrix-decrypt/
 ---
 
-## Netscaler
+Citrix Netscaler (or whatever they're calling it now) uses hardcoded encryption keys to encrypt at least some passwords stored in the appliance config, most importantly for LDAP bind passwords. This post details how to recover the cleartext for them.
 
-Citrix Netscaler (or whatever they're calling it now) uses hardcoded encryption keys to encrypt at least some passwords stored in the appliance config, most importantly for LDAP bind passwords. As a side note - **the passwords for accessing the appliance itself via CLI or GUI are hashed, not encrypted**. You can still attempt to break these using hashcat but it requires bruteforcing.
+As a side note - **the passwords for accessing the appliance itself via CLI or GUI are hashed, not encrypted**. You can still attempt to break these using hashcat but it requires bruteforcing.
 
 However, some other values in the config like LDAP bind passwords are encrypted and can be recovered as by default they are encrypted by hardcoded keys that seem to be common to all Netscalers. These static encryption keys are compliled into the `libnscli90.so` library on the appliance. As of 10.5 this was the RC4 key `2286da6ca015bcd9b7259753c2a5fbc2`. At some point Citrix changed the default key and cipher used to encrypt cleartext values. The default key is now 
 ```
