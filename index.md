@@ -6,6 +6,6 @@ layout: home
 ---
 Personal hacking and security blog by [@dozernz](https://twitter.com/dozernz) 
 
-See [about](/about), my (public) [advisories](/advisories), or my [blog posts](/posts).
+See [about](/about/), my (public) [advisories](/advisories/), or my [blog posts](/posts/).
 
 ## Posts
