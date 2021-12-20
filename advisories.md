@@ -6,6 +6,9 @@ permalink: /advisories/
 
 A list of my (old) public advisories. Several of these contain remote preauth -> root exploit bug chains, and all contain full proof of concept exploit details.
 
+#### [SaltStack Salt - March 2021](/uploads/salt.txt)
+CVE-2021-3197, CVE-2021-25281 and CVE-2021-25282, discovered via variant analysis. [Post here](/posts/saltapi-vulns).
+
 #### [Calibre - December 2019](/uploads/calibre-xxe.txt)
 Straightforward XXE then exfiltration of the read file from inside the sandbox. [Launchpad Ref](https://bugs.launchpad.net/calibre/+bug/1857800), fixed in 4.8. POC at [poc3.epub](/uploads/poc3.epub)
 
