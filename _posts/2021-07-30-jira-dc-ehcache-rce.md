@@ -150,7 +150,7 @@ I began wondering if this vulnerability required a custom Java deserialization g
 
 A quick bit of bash later I had it trying every payload ysoserial has to offer, resulting in a notepad.exe spawning! As a sidenote, calc.exe did not spawn even with a working exploit. I assume this is because it is now a UWP app? 
 
-![]({{ site.baseurl }}/assets/jira.PNG)
+[![]({{ site.baseurl }}/assets/jira.PNG)]({{ site.baseurl }}/assets/jira.PNG)
 
 This turned out to be due to the CommonsBeanutils1 gadget working successfully. So now I had a working POC, excellent.
 

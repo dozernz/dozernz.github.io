@@ -1,5 +1,10 @@
 title: dozer.nz
-description: hacking and technology
+description: > 
+  My personal infosec website, containing details on vulnerabilities I've found, hacking and 
+  reverse engineering writeups, 
+  and security advisories for my findings.
+  
+
  
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://dozer.nz" 

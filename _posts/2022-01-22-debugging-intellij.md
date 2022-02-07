@@ -100,7 +100,7 @@ Ensure you do not expose this port to untrusted networks, as JDWP can be used [t
 
 Now the debugger is listening on the target, we need to configure it in IntelliJ. In the project with the line-stretched source code, create a Run/Debug configuration under Run->Edit Configurations, like the following:
 
-![Intellij Config]({{ site.baseurl }}/assets/debugopts.png)
+[![Intellij Config]({{ site.baseurl }}/assets/debugopts.png)]({{ site.baseurl }}/assets/debugopts.png)
   
 Then select Run->Debug, and the created configuration. A window should open, and output `Connected to the target VM, address: '192.168.200.81:8000', transport: 'socket'`
 
@@ -110,29 +110,29 @@ Set a breakpoint on the `doValidate` method in the class, which is called during
    
 Issue a login request, and the debugger should break:
    
-![break]({{ site.baseurl }}/assets/debug1.PNG)
+[![break]({{ site.baseurl }}/assets/debug1.PNG)]({{ site.baseurl }}/assets/debug1.PNG)
    
 It is now possible to step through the execution, inspecting variables and the call stack.
    
 For example, after stepping through a few lines the submitted username and password are visible as variables:
    
-![]({{ site.baseurl }}/assets/debug2.PNG)
+[![]({{ site.baseurl }}/assets/debug2.PNG)]({{ site.baseurl }}/assets/debug2.PNG)
       
 Now it is possible to investigate the value of variables, and determine the call stack where it is unclear from source code alone.
       
 Another good idea is setting breakpoints on dangerous functions in the codebase. For example, setting a breakpoint on the `ProcessBuilder` constructor can catch when it is used by the application:
       
-![]({{ site.baseurl }}/assets/debug3.PNG)
+[![]({{ site.baseurl }}/assets/debug3.PNG)]({{ site.baseurl }}/assets/debug3.PNG)
          
          
 However, this can interfere with the application if it frequently uses the breakpointed function, and you need to go back to IntelliJ to continue execution every time. IntelliJ can alter the breakpoint so that it does not suspend execution, and instead evaluates an expression:
          
-![]({{ site.baseurl }}/assets/debug5.PNG)
+[![]({{ site.baseurl }}/assets/debug5.PNG)]({{ site.baseurl }}/assets/debug5.PNG)
             
             
 Once this change is made the application will continue to run, with the debugger printing out the value of the `command` string array whenever the `ProcessBuilder` constructor is called:
             
-![]({{ site.baseurl }}/assets/debug6.PNG)
+[![]({{ site.baseurl }}/assets/debug6.PNG)]({{ site.baseurl }}/assets/debug6.PNG)
 
 
 This is useful for tracking calls to dangerous sinks at application runtime, rather than through static analysis of the code. Now we can use this to debug applications and track down more complex vulnerabilities!
