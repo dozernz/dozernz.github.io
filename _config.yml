@@ -13,6 +13,10 @@ url: "https://dozer.nz"
 markdown: kramdown
 remote_theme: jekyll/minima
 
+
+# posts dont show up if i date them today in my timezone
+future: true
+
 show_excerpts: true
 
 minima:
