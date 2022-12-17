@@ -6,7 +6,6 @@ description: >
   and security advisories for my findings.
   
 
- 
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://dozer.nz" 
 
