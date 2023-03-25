@@ -12,7 +12,11 @@ url: "https://dozer.nz"
 # Build settings
 markdown: kramdown
 remote_theme: jekyll/minima
-
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    inline_theme: base16.dark
+    wrap: true
 
 # posts dont show up if i date them today in my timezone
 future: true

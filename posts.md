@@ -1,10 +1,8 @@
 ---
-layout: default
+layout: page
 title: Posts
 permalink: /posts/
 ---
-<h1>Posts</h1>
-
 <ul>
   {% for post in site.posts %}
     <li>

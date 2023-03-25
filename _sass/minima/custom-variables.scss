@@ -14,3 +14,6 @@ iframe.yt {
     height: 100%;
     border: 0;
 }
+
+//Remove highlighting from background of code that doesnt match theme
+code>span { background-color: #212121 !important; }
