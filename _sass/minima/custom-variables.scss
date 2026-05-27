@@ -15,5 +15,9 @@ iframe.yt {
     border: 0;
 }
 
+.site-nav .page-link + .page-link {
+  margin-left: 20px;
+}
+
 //Remove highlighting from background of code that doesnt match theme
 code>span { background-color: #212121 !important; }
